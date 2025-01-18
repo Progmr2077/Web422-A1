@@ -37,7 +37,8 @@ const movieSchema = new Schema({
     dvd: Date,
     lastUpdated: Date
   }
-});
+}
+);
 
 module.exports = class MoviesDB {
   constructor() {
@@ -51,17 +52,15 @@ module.exports = class MoviesDB {
       const db = mongoose.createConnection(
         connectionString,
         {
-          retryWrites: true,
-          w: 'majority'
+          useNewUrlParser: true,
+          useUnifiedTopology: true
         }
       );
 
       db.once('error', (err) => {
-        console.error("Database connection error:", err);
         reject(err);
       });
       db.once('open', () => {
-        console.log("Database connection successful");
         this.Movie = db.model("movies", movieSchema);
         resolve();
       });
@@ -77,8 +76,8 @@ module.exports = class MoviesDB {
   getAllMovies(page, perPage, title) {
     let findBy = title ? { title } : {};
 
-    if (Number.isInteger(page) && Number.isInteger(perPage) && page > 0 && perPage > 0) {
-      return this.Movie.find(findBy).sort({ year: +1 }).skip((page - 1) * perPage).limit(perPage).exec();
+    if (+page && +perPage) {
+      return this.Movie.find(findBy).sort({ year: +1 }).skip((page - 1) * +perPage).limit(+perPage).exec();
     }
 
     return Promise.reject(new Error('page and perPage query parameters must be valid numbers'));
