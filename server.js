@@ -28,21 +28,9 @@ app.post("/api/movies", (req, res) => {
 
 app.get("/api/movies", (req, res) => {
   const { page, perPage, title } = req.query;
-
-  // Validate page and perPage
-  const pageNum = parseInt(page, 10);
-  const perPageNum = parseInt(perPage, 10);
-
-  if (isNaN(pageNum) || isNaN(perPageNum) || pageNum <= 0 || perPageNum <= 0) {
-    return res.status(400).json({ error: "page and perPage query parameters must be valid positive numbers" });
-  }
-
-  db.getAllMovies(pageNum, perPageNum, title)
+  db.getAllMovies(page, perPage, title)
     .then((movies) => res.json(movies))
-    .catch((err) => {
-      console.error("Error getting movies:", err);
-      res.status(500).json({ error: err.message });
-    });
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 app.get("/api/movies/:id", (req, res) => {
@@ -57,19 +45,13 @@ app.get("/api/movies/:id", (req, res) => {
 app.put("/api/movies/:id", (req, res) => {
   db.updateMovieById(req.body, req.params.id)
     .then(() => res.status(204).send())
-    .catch((err) => {
-      console.error("Error updating movie:", err);
-      res.status(500).json({ error: err.message });
-    });
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 app.delete("/api/movies/:id", (req, res) => {
   db.deleteMovieById(req.params.id)
     .then(() => res.status(204).send())
-    .catch((err) => {
-      console.error("Error deleting movie:", err);
-      res.status(500).json({ error: err.message });
-    });
+    .catch((err) => res.status(500).json({ error: err.message }));
 });
 
 // Initialize DB and Start Server
@@ -80,5 +62,5 @@ db.initialize(process.env.MONGODB_CONN_STRING)
     });
   })
   .catch((err) => {
-    console.error("Error initializing database:", err);
+    console.error(err);
   });
