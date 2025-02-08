@@ -7,11 +7,15 @@
  * Name: Your Name Student ID: Your ID Date:   
  ********************************************************************************/
 
+require('dotenv').config();
+const MONGODB_CONN_STRING = process.env.MONGODB_CONN_STRING;
+
 let page = 1;
 const perPage = 10;
 
 function loadMovieData(title = null) {
-    let url = `/api/movies?page=${page}&perPage=${perPage}`;
+    // Use environment variable for URL
+    let url = `${MONGODB_CONN_STRING}/api/movies?page=${page}&perPage=${perPage}`;
     if (title) {
         url += `&title=${title}`;
         page = 1;
@@ -39,7 +43,7 @@ function loadMovieData(title = null) {
             document.querySelectorAll("#moviesTable tbody tr").forEach(row => {
                 row.addEventListener("click", () => {
                     const movieId = row.getAttribute("data-id");
-                    fetch(`/api/movies/${movieId}`)
+                    fetch(`${MONGODB_CONN_STRING}/api/movies/${movieId}`)
                         .then(response => response.json())
                         .then(movie => {
                             document.querySelector("#detailsModalLabel").textContent = movie.title;
