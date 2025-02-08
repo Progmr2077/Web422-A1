@@ -1,20 +1,14 @@
-/********************************************************************************* 
- * WEB422 – Assignment 2 
- * I declare that this assignment is my own work in accordance with Seneca Academic Policy. 
- * No part of this assignment has been copied manually or electronically from any other source 
- * (including web sites) or distributed to other students. 
- * 
- * Name: Your Name Student ID: Your ID Date:   
- ********************************************************************************/
-
 let page = 1;
 const perPage = 10;
 
 function loadMovieData(title = null) {
+    if (title) {
+        page = 1; // Ensure page resets before constructing the URL
+    }
+
     let url = `/api/movies?page=${page}&perPage=${perPage}`;
     if (title) {
         url += `&title=${title}`;
-        page = 1;
         document.querySelector(".pagination").classList.add("d-none");
     } else {
         document.querySelector(".pagination").classList.remove("d-none");
@@ -44,7 +38,7 @@ function loadMovieData(title = null) {
                         .then(movie => {
                             document.querySelector("#detailsModalLabel").textContent = movie.title;
                             document.querySelector("#detailsModal .modal-body").innerHTML = `
-                                <img class="img-fluid w-100" src="${movie.poster || ''}"><br><br>
+                                <img class="img-fluid w-100" src="${movie.poster || ''}" alt="Movie Poster"><br><br>
                                 <strong>Directed By:</strong> ${movie.directors.join(", ")}<br><br>
                                 <p>${movie.fullplot}</p>
                                 <strong>Cast:</strong> ${movie.cast ? movie.cast.join(", ") : "N/A"}<br><br>
@@ -52,10 +46,12 @@ function loadMovieData(title = null) {
                                 <strong>IMDB Rating:</strong> ${movie.imdb.rating} (${movie.imdb.votes} votes)
                             `;
                             new bootstrap.Modal(document.querySelector("#detailsModal")).show();
-                        });
+                        })
+                        .catch(error => console.error("Error loading movie details:", error));
                 });
             });
-        });
+        })
+        .catch(error => console.error("Error loading movie data:", error));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
